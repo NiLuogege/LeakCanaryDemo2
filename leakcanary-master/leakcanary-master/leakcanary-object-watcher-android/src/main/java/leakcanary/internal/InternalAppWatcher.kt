@@ -42,6 +42,7 @@ internal object InternalAppWatcher {
 
     init {
         val internalLeakCanary = try {
+            //这里用反射的形式 初始化 一个InternalLeakCanary
             val leakCanaryListener = Class.forName("leakcanary.internal.InternalLeakCanary")
             leakCanaryListener.getDeclaredField("INSTANCE").get(null)
         } catch (ignored: Throwable) {
@@ -79,7 +80,7 @@ internal object InternalAppWatcher {
         ActivityDestroyWatcher.install(application, objectWatcher, configProvider)
         //安装 FragmentDestroyWatcher
         FragmentDestroyWatcher.install(application, objectWatcher, configProvider)
-        // 这应该是个回调 但具体用来干啥 还不太清楚
+        // 调用 InternalLeakCanary 的 invoke 方法
         onAppWatcherInstalled(application)
     }
 

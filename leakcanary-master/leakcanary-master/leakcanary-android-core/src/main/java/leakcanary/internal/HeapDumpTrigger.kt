@@ -139,6 +139,7 @@ internal class HeapDumpTrigger(
         dumpHeap(retainedReferenceCount, retry = true)
     }
 
+    //进行内存快照
     private fun dumpHeap(
             retainedReferenceCount: Int,
             retry: Boolean
@@ -146,6 +147,8 @@ internal class HeapDumpTrigger(
         saveResourceIdNamesToMemory()
         val heapDumpUptimeMillis = SystemClock.uptimeMillis()
         KeyedWeakReference.heapDumpUptimeMillis = heapDumpUptimeMillis
+
+        //生成.hropf文件
         val heapDumpFile = heapDumper.dumpHeap()
         if (heapDumpFile == null) {
             if (retry) {
