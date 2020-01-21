@@ -132,15 +132,18 @@ class ObjectWatcher constructor(
      */
     @Synchronized
     fun watch(watchedObject: Any, description: String) {
+        //ObjectWatcher 的开关
         if (!isEnabled()) {
             return
         }
+        // 将已经被 回收的对象过滤掉
         removeWeaklyReachableObjects()
-        val key = UUID.randomUUID()
-                .toString()
+        // 获取一个随机的key
+        val key = UUID.randomUUID().toString()
         val watchUptimeMillis = clock.uptimeMillis()
-        val reference =
-                KeyedWeakReference(watchedObject, key, description, watchUptimeMillis, queue)
+
+        //创建一个 KeyedWeakReference
+        val reference = KeyedWeakReference(watchedObject, key, description, watchUptimeMillis, queue)
         SharkLog.d {
             "Watching " +
                     (if (watchedObject is Class<*>) watchedObject.toString() else "instance of ${watchedObject.javaClass.name}") +
@@ -148,7 +151,9 @@ class ObjectWatcher constructor(
                     " with key $key"
         }
 
+        //添加到 watchedObjects 中
         watchedObjects[key] = reference
+        //延时5s后执行
         checkRetainedExecutor.execute {
             moveToRetained(key)
         }
