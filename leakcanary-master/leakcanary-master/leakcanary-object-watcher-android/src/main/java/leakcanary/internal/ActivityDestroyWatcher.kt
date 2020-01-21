@@ -22,30 +22,31 @@ import leakcanary.ObjectWatcher
 import leakcanary.internal.InternalAppWatcher.noOpDelegate
 
 internal class ActivityDestroyWatcher private constructor(
-  private val objectWatcher: ObjectWatcher,
-  private val configProvider: () -> Config
+        private val objectWatcher: ObjectWatcher,
+        private val configProvider: () -> Config
 ) {
 
-  private val lifecycleCallbacks =
-    object : Application.ActivityLifecycleCallbacks by noOpDelegate() {
-      override fun onActivityDestroyed(activity: Activity) {
-        if (configProvider().watchActivities) {
-          objectWatcher.watch(
-              activity, "${activity::class.java.name} received Activity#onDestroy() callback"
-          )
+    private val lifecycleCallbacks = object : Application.ActivityLifecycleCallbacks by noOpDelegate() {
+        override fun onActivityDestroyed(activity: Activity) {
+            //如果 允许 watchActivitie
+            if (configProvider().watchActivities) {
+                //观察 activity 并添加描述
+                objectWatcher.watch(
+                        activity, "${activity::class.java.name} received Activity#onDestroy() callback"
+                )
+            }
         }
-      }
     }
 
-  companion object {
-    fun install(
-      application: Application,
-      objectWatcher: ObjectWatcher,
-      configProvider: () -> Config
-    ) {
-      val activityDestroyWatcher =
-        ActivityDestroyWatcher(objectWatcher, configProvider)
-      application.registerActivityLifecycleCallbacks(activityDestroyWatcher.lifecycleCallbacks)
+    companion object {
+        fun install(
+                application: Application,
+                objectWatcher: ObjectWatcher,
+                configProvider: () -> Config
+        ) {
+            val activityDestroyWatcher = ActivityDestroyWatcher(objectWatcher, configProvider)
+            //添加 全局activity生命周期 监听器
+            application.registerActivityLifecycleCallbacks(activityDestroyWatcher.lifecycleCallbacks)
+        }
     }
-  }
 }
