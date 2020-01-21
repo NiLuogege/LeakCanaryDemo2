@@ -22,41 +22,41 @@ import shark.SharkLog
  */
 class DefaultOnHeapAnalyzedListener(private val application: Application) : OnHeapAnalyzedListener {
 
-  override fun onHeapAnalyzed(heapAnalysis: HeapAnalysis) {
-    SharkLog.d { "$heapAnalysis" }
+    override fun onHeapAnalyzed(heapAnalysis: HeapAnalysis) {
+        SharkLog.d { "$heapAnalysis" }
 
-    val id = LeaksDbHelper(application).writableDatabase.use { db ->
-      HeapAnalysisTable.insert(db, heapAnalysis)
+        val id = LeaksDbHelper(application).writableDatabase.use { db ->
+            HeapAnalysisTable.insert(db, heapAnalysis)
+        }
+
+        val (contentTitle, screenToShow) = when (heapAnalysis) {
+            is HeapAnalysisFailure -> application.getString(
+                    R.string.leak_canary_analysis_failed
+            ) to HeapAnalysisFailureScreen(id)
+            is HeapAnalysisSuccess -> {
+                val retainedObjectCount = heapAnalysis.allLeaks.sumBy { it.leakTraces.size }
+                val leakTypeCount = heapAnalysis.applicationLeaks.size + heapAnalysis.libraryLeaks.size
+                application.getString(
+                        R.string.leak_canary_analysis_success_notification, retainedObjectCount, leakTypeCount
+                ) to HeapDumpScreen(id)
+            }
+        }
+
+        val pendingIntent = LeakActivity.createPendingIntent(
+                application, arrayListOf(HeapDumpsScreen(), screenToShow)
+        )
+
+        val contentText = application.getString(R.string.leak_canary_notification_message)
+
+        Notifications.showNotification(
+                application, contentTitle, contentText, pendingIntent,
+                R.id.leak_canary_notification_analysis_result,
+                LEAKCANARY_MAX
+        )
     }
 
-    val (contentTitle, screenToShow) = when (heapAnalysis) {
-      is HeapAnalysisFailure -> application.getString(
-          R.string.leak_canary_analysis_failed
-      ) to HeapAnalysisFailureScreen(id)
-      is HeapAnalysisSuccess -> {
-        val retainedObjectCount = heapAnalysis.allLeaks.sumBy { it.leakTraces.size }
-        val leakTypeCount = heapAnalysis.applicationLeaks.size + heapAnalysis.libraryLeaks.size
-        application.getString(
-            R.string.leak_canary_analysis_success_notification, retainedObjectCount, leakTypeCount
-        ) to HeapDumpScreen(id)
-      }
+    companion object {
+        fun create(): OnHeapAnalyzedListener =
+                DefaultOnHeapAnalyzedListener(InternalLeakCanary.application)
     }
-
-    val pendingIntent = LeakActivity.createPendingIntent(
-        application, arrayListOf(HeapDumpsScreen(), screenToShow)
-    )
-
-    val contentText = application.getString(R.string.leak_canary_notification_message)
-
-    Notifications.showNotification(
-        application, contentTitle, contentText, pendingIntent,
-        R.id.leak_canary_notification_analysis_result,
-        LEAKCANARY_MAX
-    )
-  }
-
-  companion object {
-    fun create(): OnHeapAnalyzedListener =
-      DefaultOnHeapAnalyzedListener(InternalLeakCanary.application)
-  }
 }
