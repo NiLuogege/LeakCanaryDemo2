@@ -30,13 +30,18 @@ object KeyedWeakReferenceFinder : LeakingObjectFinder {
 
             val addedToContext: List<KeyedWeakReferenceMirror> = graph.instances
                     .filter { instance ->
+                        //拿到所有的 KeyedWeakReference 对象
                         val className = instance.instanceClassName
                         className == "leakcanary.KeyedWeakReference" || className == "com.squareup.leakcanary.KeyedWeakReference"
                     }
                     .map {
+                        //转换成KeyedWeakReferenceMirror
                         KeyedWeakReferenceMirror.fromInstance(it, heapDumpUptimeMillis)
                     }
-                    .filter { it.hasReferent }
+                    .filter {
+                        //过滤掉没有泄露的
+                        it.hasReferent
+                    }
                     .toList()
             graph.context[KEYED_WEAK_REFERENCE.name] = addedToContext
             addedToContext
