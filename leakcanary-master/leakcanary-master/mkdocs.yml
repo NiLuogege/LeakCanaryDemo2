@@ -1,0 +1,94 @@
+# pip install mkdocs mkdocs-material
+# mkdocs serve
+# mkdocs gh-deploy
+
+extra:
+  leak_canary:
+    release: '2.1'
+    next_release: '2.2'
+
+site_name: LeakCanary
+site_url: https://square.github.io/leakcanary/
+repo_name: LeakCanary
+repo_url: https://github.com/square/leakcanary
+site_description: "A memory leak detection library for Android"
+site_author: Square, Inc.
+remote_branch: gh-pages
+
+copyright: 'Copyright &copy; 2015 Square, Inc.'
+
+
+theme:
+  name: 'material'
+  custom_dir: 'docs/theme'
+  logo: 'images/logo.png'
+  favicon: 'images/logo.png'
+  palette:
+    primary: 'deep-orange'
+    accent: 'deep-purple'
+  feature:
+    tabs: true
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - tables
+  - admonition
+
+plugins:
+    - search
+    - markdownextradata: {}
+
+nav:
+  - 'Overview': index.md
+  - 'Getting Started': getting_started.md
+  - 'Fundamentals':
+    - 'Introduction': 'fundamentals.md'
+    - 'How LeakCanary works': 'fundamentals-how-leakcanary-works.md'
+    - 'Fixing a memory leak': 'fundamentals-fixing-a-memory-leak.md'
+  - 'Help & Community':
+    - 'Code recipes': recipes.md
+    - 'FAQ': faq.md
+    - 'Support': support.md
+    - 'Upgrading to LeakCanary 2': upgrading-to-leakcanary-2.0.md
+    - 'Recorded Presentations': recorded-presentations.md
+    - 'Blog Articles': blog-articles.md
+    - 'Stack Overflow ⏏': https://stackoverflow.com/questions/tagged/leakcanary?sort=active
+    - 'Contributing':
+        - 'How to help': how_to_help.md
+        - 'Code of Conduct': code_of_conduct.md
+        - 'Dev Environment': dev-env.md
+        - 'Releasing': releasing.md
+  - 'Shark':
+    - 'Overview': shark.md
+    - 'Shark API':
+      - 'Shark': api/shark/shark/index.md
+      - 'Extension: Shark Android': api/shark-android/shark/index.md
+      - 'Core: Graph': api/shark-graph/shark/index.md
+      - 'Core: Hprof': api/shark-hprof/shark/index.md
+      - 'Core: Logs': api/shark-log/shark/index.md
+  - 'LeakCanary API':
+    - 'LeakCanary': api/leakcanary-android-core/leakcanary/index.md
+    - 'ObjectWatcher Android': api/leakcanary-object-watcher-android/leakcanary/index.md
+    - 'Extension: Instrumentation tests': api/leakcanary-android-instrumentation/leakcanary/index.md
+    - 'Extension: Separate process': api/leakcanary-android-process/leakcanary/index.md
+    - 'Core: ObjectWatcher': api/leakcanary-object-watcher/leakcanary/index.md
+  - 'Change Log': changelog.md
+
+# Google Analytics. Add export LEAKCANARY_GOOGLE_ANALYTICS_KEY="UA-XXXXXXXXX-X" to your ~/.bashrc
+google_analytics:
+  - !!python/object/apply:os.getenv ["LEAKCANARY_GOOGLE_ANALYTICS_KEY"]
+  - auto
