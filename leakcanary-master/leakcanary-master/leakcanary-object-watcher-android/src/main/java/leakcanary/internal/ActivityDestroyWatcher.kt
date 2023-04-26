@@ -21,11 +21,15 @@ import leakcanary.AppWatcher.Config
 import leakcanary.ObjectWatcher
 import leakcanary.internal.InternalAppWatcher.noOpDelegate
 
+/**
+ * activity Destroy 以后会被添加到 objectWatcher 中
+ */
 internal class ActivityDestroyWatcher private constructor(
         private val objectWatcher: ObjectWatcher,
         private val configProvider: () -> Config
 ) {
 
+    //这里会感知到 activity 的 destory 方法调用
     private val lifecycleCallbacks = object : Application.ActivityLifecycleCallbacks by noOpDelegate() {
         override fun onActivityDestroyed(activity: Activity) {
             //如果 允许 watchActivitie

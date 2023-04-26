@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentManager
 import leakcanary.AppWatcher.Config
 import leakcanary.ObjectWatcher
 
+
+//这是针对 androidx 的 fragment 生命周期监听
 internal class AndroidXFragmentDestroyWatcher(
   private val objectWatcher: ObjectWatcher,
   private val configProvider: () -> Config

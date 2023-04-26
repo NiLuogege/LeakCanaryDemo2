@@ -24,6 +24,7 @@ import android.app.FragmentManager
 import leakcanary.AppWatcher.Config
 import leakcanary.ObjectWatcher
 
+//这是针对 android o 以后的fragment 监听
 @SuppressLint("NewApi")
 internal class AndroidOFragmentDestroyWatcher(
   private val objectWatcher: ObjectWatcher,
@@ -56,6 +57,7 @@ internal class AndroidOFragmentDestroyWatcher(
     }
   }
 
+  //注册了一个 fragment 生命周期的 监听
   override fun invoke(activity: Activity) {
     val fragmentManager = activity.fragmentManager
     fragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true)

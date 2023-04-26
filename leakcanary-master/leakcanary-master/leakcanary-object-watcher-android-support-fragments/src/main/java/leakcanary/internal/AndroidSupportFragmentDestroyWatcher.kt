@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentManager
 import leakcanary.AppWatcher.Config
 import leakcanary.ObjectWatcher
 
+//针对 support.v4.app.Fragment
 internal class AndroidSupportFragmentDestroyWatcher(
   private val objectWatcher: ObjectWatcher,
   private val configProvider: () -> Config
@@ -54,6 +55,7 @@ internal class AndroidSupportFragmentDestroyWatcher(
     }
   }
 
+  //注册fragment的生命周期监听
   override fun invoke(activity: Activity) {
     if (activity is FragmentActivity) {
       val supportFragmentManager = activity.supportFragmentManager
