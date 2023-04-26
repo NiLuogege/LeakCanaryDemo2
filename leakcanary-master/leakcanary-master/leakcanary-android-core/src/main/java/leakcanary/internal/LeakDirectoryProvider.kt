@@ -35,6 +35,8 @@ import java.util.Locale
 
 /**
  * Provides access to where heap dumps and analysis results will be stored.
+ *
+ * 堆转储文件目录帮助类
  */
 internal class LeakDirectoryProvider constructor(
   context: Context,

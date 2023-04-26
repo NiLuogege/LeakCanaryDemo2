@@ -59,6 +59,7 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
         }
     }
 
+    //堆转储文件目录帮助类
     val leakDirectoryProvider: LeakDirectoryProvider by lazy {
         LeakDirectoryProvider(application, {
             LeakCanary.config.maxStoredHeapDumps
@@ -78,13 +79,17 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
                 onHeapAnalyzedListener = OnHeapAnalyzedListener {}
         )
 
+    //会在 InternalAppWatcher 的 install 方法中会被调用
     override fun invoke(application: Application) {
         this.application = application
 
+        //添加对象被保留的监听
         AppWatcher.objectWatcher.addOnObjectRetainedListener(this)
 
+        //创建堆转储文件生成器
         val heapDumper = AndroidHeapDumper(application, leakDirectoryProvider)
 
+        //gc 触发器
         val gcTrigger = GcTrigger.Default
 
         val configProvider = { LeakCanary.config }
