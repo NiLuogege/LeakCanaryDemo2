@@ -93,9 +93,10 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
         val gcTrigger = GcTrigger.Default
 
         val configProvider = { LeakCanary.config }
-
+        //创建异步线程
         val handlerThread = HandlerThread(LEAK_CANARY_THREAD_NAME)
         handlerThread.start()
+        //异步线程用于后台服务
         val backgroundHandler = Handler(handlerThread.looper)
 
         //初始化HeapDumpTrigger
@@ -104,14 +105,20 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
                 configProvider
         )
         application.registerVisibilityListener { applicationVisible ->
+            //当APP可见性切换时就会回调 到这个方法
             this.applicationVisible = applicationVisible
             heapDumpTrigger.onApplicationVisibilityChanged(applicationVisible)
         }
+        //创建桌面快捷图标 点击直接进入LeakActivity
         addDynamicShortcut(application)
 
+        //单元测试环境 禁用堆转储功能
         disableDumpHeapInTests()
     }
 
+    /**
+     * 单元测试环境 禁用堆转储功能
+     */
     private fun disableDumpHeapInTests() {
         // This is called before Application.onCreate(), so if the class is loaded through a secondary
         // dex it might not be available yet.
@@ -123,6 +130,9 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
         }
     }
 
+    /**
+     * 创建桌面快捷图标 点击直接进入LeakActivity
+     */
     @Suppress("ReturnCount")
     private fun addDynamicShortcut(application: Application) {
         if (VERSION.SDK_INT < VERSION_CODES.N_MR1) {
@@ -205,6 +215,7 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
             return
         }
 
+        //启动 LeakActivity 的Intent
         val intent = leakDisplayActivityIntent
         intent.action = "Dummy Action because Android is stupid"
         val shortcut = Builder(application, DYNAMIC_SHORTCUT_ID)
@@ -226,6 +237,7 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
         }
     }
 
+    //当有异常对象是会回调
     override fun onObjectRetained() {
         if (this::heapDumpTrigger.isInitialized) {
             heapDumpTrigger.onObjectRetained()
