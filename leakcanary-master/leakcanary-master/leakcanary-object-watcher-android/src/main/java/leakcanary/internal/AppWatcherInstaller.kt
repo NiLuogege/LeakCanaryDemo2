@@ -10,11 +10,17 @@ import leakcanary.AppWatcher
 /**
  * Content providers are loaded before the application class is created. [AppWatcherInstaller] is
  * used to install [leakcanary.AppWatcher] on application start.
+ *
+ * LeakCanary 的自启动器，这是一个ContentProvider 先于application 启动
+ *
+ * sealed 关键字标识密封类， 标识 AppWatcherInstaller 这个对象就只有这个文件中声明的 这几种子类
  */
 internal sealed class AppWatcherInstaller : ContentProvider() {
 
     /**
      * [MainProcess] automatically sets up the LeakCanary code that runs in the main app process.
+     *
+     * 这个是一般使用时 APP 使用的 ContentProvider
      */
     internal class MainProcess : AppWatcherInstaller()
 
@@ -32,6 +38,7 @@ internal sealed class AppWatcherInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
         val application = context!!.applicationContext as Application
+        //进行初始化
         InternalAppWatcher.install(application)
         return true
     }

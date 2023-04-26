@@ -26,6 +26,7 @@ import shark.SharkLog
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
+//这玩意儿 继承了一个 方法？？？
 internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedListener {
 
     private const val DYNAMIC_SHORTCUT_ID = "com.squareup.leakcanary.dynamic_shortcut"

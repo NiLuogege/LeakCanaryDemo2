@@ -28,6 +28,7 @@ internal object InternalAppWatcher {
         (application.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
     }
 
+    //ContentProvider 中传过来的 application
     lateinit var application: Application
 
     private val clock = object : Clock {
