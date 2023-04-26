@@ -26,7 +26,8 @@ import shark.SharkLog
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
-//这玩意儿 继承了一个 方法？？？
+//因为这玩意儿 继承了一个 (Application) -> Unit 方法,所以需要重写一个 invoke(application: Application) 方法
+// 当在InternalAppWatcher 中调用 onAppWatcherInstalled(application) 时就会走到 这个 invoke 方法中
 internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedListener {
 
     private const val DYNAMIC_SHORTCUT_ID = "com.squareup.leakcanary.dynamic_shortcut"

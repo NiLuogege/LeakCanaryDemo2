@@ -5,9 +5,18 @@ import org.junit.Test
 
 class AppWatcherTest {
 
-  @Test fun appWatcherLoads_notInstalled() {
-    assertThat(AppWatcher.isInstalled)
-        .describedAs("Ensure AppWatcher doesn't crash in JUnit tests")
-        .isFalse()
-  }
+    @Test
+    fun appWatcherLoads_notInstalled() {
+        assertThat(AppWatcher.isInstalled)
+                .describedAs("Ensure AppWatcher doesn't crash in JUnit tests")
+                .isFalse()
+    }
+
+
+    @Test
+    fun test1() {
+        MyTest()("bbb")
+    }
+
+
 }
