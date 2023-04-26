@@ -75,7 +75,7 @@ internal object InternalAppWatcher {
         }
         InternalAppWatcher.application = application
 
-        //获取配置
+        //获取配置 ，这里为啥要将  AppWatcher.config 包装为一个方法返回值呢？
         val configProvider = { AppWatcher.config }
         //安装 ActivityDestroyWatcher
         ActivityDestroyWatcher.install(application, objectWatcher, configProvider)

@@ -44,6 +44,7 @@ internal class ActivityDestroyWatcher private constructor(
                 objectWatcher: ObjectWatcher,
                 configProvider: () -> Config
         ) {
+            //创建 ActivityDestroyWatcher
             val activityDestroyWatcher = ActivityDestroyWatcher(objectWatcher, configProvider)
             //添加 全局activity生命周期 监听器
             application.registerActivityLifecycleCallbacks(activityDestroyWatcher.lifecycleCallbacks)
