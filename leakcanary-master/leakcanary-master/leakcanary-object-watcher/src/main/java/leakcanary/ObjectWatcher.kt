@@ -46,6 +46,8 @@ class ObjectWatcher constructor(
 
     /**
      * References passed to [watch].
+     *
+     * uuid 为 key ，activity 的 弱引用对象为 value
      */
     private val watchedObjects = mutableMapOf<String, KeyedWeakReference>()
 
@@ -129,6 +131,8 @@ class ObjectWatcher constructor(
      * Watches the provided [watchedObject].
      *
      * @param description Describes why the object is watched.
+     *
+     * activity fragment 销毁以后会调用这个方法
      */
     @Synchronized
     fun watch(watchedObject: Any, description: String) {
@@ -153,8 +157,9 @@ class ObjectWatcher constructor(
 
         //添加到 watchedObjects 中
         watchedObjects[key] = reference
-        //延时5s后执行
+
         checkRetainedExecutor.execute {
+            //这个方法会在主线程延时5s后执行
             moveToRetained(key)
         }
     }
@@ -182,19 +187,25 @@ class ObjectWatcher constructor(
 
     @Synchronized
     private fun moveToRetained(key: String) {
+        //从 watchedObjects 中移除未泄露的 对象
         removeWeaklyReachableObjects()
+        //通过key 获得被监控对象，如果能获取到 说明可能是 泄漏了
         val retainedRef = watchedObjects[key]
         if (retainedRef != null) {
+            //更新时间
             retainedRef.retainedUptimeMillis = clock.uptimeMillis()
+            //回调监听，这个会 回调到 InternalLeakCanary 的 onObjectRetained
             onObjectRetainedListeners.forEach { it.onObjectRetained() }
         }
     }
 
+    //从 watchedObjects 中移除未泄露的 对象
     private fun removeWeaklyReachableObjects() {
         // WeakReferences are enqueued as soon as the object to which they point to becomes weakly
         // reachable. This is before finalization or garbage collection has actually happened.
         var ref: KeyedWeakReference?
         do {
+            //queue 中有 说明是已经被回收了。是正常情况，没有泄露
             ref = queue.poll() as KeyedWeakReference?
             if (ref != null) {
                 watchedObjects.remove(ref.key)

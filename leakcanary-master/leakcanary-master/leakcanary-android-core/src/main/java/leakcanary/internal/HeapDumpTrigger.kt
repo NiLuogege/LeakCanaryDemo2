@@ -80,6 +80,7 @@ internal class HeapDumpTrigger(
         }
     }
 
+    //当有对象可能泄漏时会回调
     fun onObjectRetained() {
         scheduleRetainedObjectCheck(
                 reason = "found new object retained",

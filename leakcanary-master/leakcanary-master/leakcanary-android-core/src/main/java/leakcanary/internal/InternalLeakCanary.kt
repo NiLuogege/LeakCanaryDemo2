@@ -237,7 +237,7 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
         }
     }
 
-    //当有异常对象是会回调
+    //当有对象可能泄漏时会回调
     override fun onObjectRetained() {
         if (this::heapDumpTrigger.isInitialized) {
             heapDumpTrigger.onObjectRetained()
