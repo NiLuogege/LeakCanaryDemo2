@@ -22,6 +22,7 @@ import android.os.IBinder
 import com.squareup.leakcanary.core.R
 import leakcanary.internal.NotificationType.LEAKCANARY_LOW
 
+//通过通知提高服务的 优先级
 internal abstract class ForegroundService(
   name: String,
   private val notificationContentTitleResId: Int,

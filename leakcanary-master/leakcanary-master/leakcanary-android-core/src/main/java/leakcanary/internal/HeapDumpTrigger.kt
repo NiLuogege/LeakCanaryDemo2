@@ -152,8 +152,8 @@ internal class HeapDumpTrigger(
 
     //进行内存快照
     private fun dumpHeap(
-            retainedReferenceCount: Int,
-            retry: Boolean
+            retainedReferenceCount: Int, //泄漏对象个数
+            retry: Boolean //是否重试 默认为 true
     ) {
         saveResourceIdNamesToMemory()
         val heapDumpUptimeMillis = SystemClock.uptimeMillis()
@@ -180,12 +180,15 @@ internal class HeapDumpTrigger(
             )
             return
         }
+        //重置变量
         lastDisplayedRetainedObjectCount = 0
         lastHeapDumpUptimeMillis = SystemClock.uptimeMillis()
         objectWatcher.clearObjectsWatchedBefore(heapDumpUptimeMillis)
+        //进行 内存快照的 分析
         HeapAnalyzerService.runAnalysis(application, heapDumpFile)
     }
 
+    //这是在干嘛，质感及时将 id 和 name的映射关系保存起来了？？
     private fun saveResourceIdNamesToMemory() {
         val resources = application.resources
         AndroidResourceIdNames.saveToMemory(
