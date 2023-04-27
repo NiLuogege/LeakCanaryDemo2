@@ -66,6 +66,8 @@ class ObjectWatcher constructor(
     /**
      * Returns the number of retained objects, ie the number of watched objects that aren't weakly
      * reachable, and have been watched for long enough to be considered retained.
+     *
+     * 获取 watchedObjects 中可能泄漏对象的 个数
      */
     val retainedObjectCount: Int
         @Synchronized get() {

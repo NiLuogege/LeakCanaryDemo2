@@ -89,6 +89,7 @@ internal class HeapDumpTrigger(
     }
 
     private fun checkRetainedObjects(reason: String) {
+        //获取config
         val config = configProvider()
         // A tick will be rescheduled when this is turned back on.
         if (!config.dumpHeap) {
@@ -96,15 +97,21 @@ internal class HeapDumpTrigger(
             return
         }
 
+        //获取 watchedObjects 中可能泄漏对象的 个数
         var retainedReferenceCount = objectWatcher.retainedObjectCount
 
+        //当可能泄漏的对象个数大于0的时候 尝试GC
         if (retainedReferenceCount > 0) {
+            //尝试GC
             gcTrigger.runGc()
+            //更新个数
             retainedReferenceCount = objectWatcher.retainedObjectCount
         }
 
+        //只有当 检查的次数大于 阈值的时候（默认是5） 才会进行下面的步骤
         if (checkRetainedCount(retainedReferenceCount, config.retainedVisibleThreshold)) return
 
+        //debug 的 时候不做内存 dump
         if (!config.dumpHeapWhenDebugging && DebuggerControl.isDebuggerAttached) {
             showRetainedCountNotification(
                     objectCount = retainedReferenceCount,
@@ -121,7 +128,9 @@ internal class HeapDumpTrigger(
         }
 
         val now = SystemClock.uptimeMillis()
+        //距离上次dump的时间
         val elapsedSinceLastDumpMillis = now - lastHeapDumpUptimeMillis
+        //两次dump时间太近 不做 处理
         if (elapsedSinceLastDumpMillis < WAIT_BETWEEN_HEAP_DUMPS_MILLIS) {
             showRetainedCountNotification(
                     objectCount = retainedReferenceCount,
@@ -137,6 +146,7 @@ internal class HeapDumpTrigger(
 
         SharkLog.d { "Check for retained objects found $retainedReferenceCount objects, dumping the heap" }
         dismissRetainedCountNotification()
+        //开始进行内存快照
         dumpHeap(retainedReferenceCount, retry = true)
     }
 
@@ -280,7 +290,9 @@ internal class HeapDumpTrigger(
             val delay = if (delayMillis > 0) " in ${delayMillis}ms" else ""
             SharkLog.d { "$verb check for retained objects${delay} because $reason" }
         }
+        //更新 checkScheduledAt
         checkScheduledAt = SystemClock.uptimeMillis() + delayMillis
+        //子线程运行 checkRetainedObjects 方法
         backgroundHandler.postDelayed({
             checkScheduledAt = 0
             checkRetainedObjects(reason)
